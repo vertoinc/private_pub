@@ -38,7 +38,10 @@ module PrivatePub
       form.set_form_data(:message => message.to_json)
 
       http = Net::HTTP.new(url.host, url.port)
-      http.use_ssl = url.scheme == "https"
+      if url.scheme == 'https'
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE if (defined?(Rails) && Rails.env == 'development') || ENV['SSL_VERIFY_NONE'] == 'true'
+      end
       http.start {|h| h.request(form)}
     end
 
